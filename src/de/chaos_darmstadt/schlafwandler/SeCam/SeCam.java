@@ -2,6 +2,8 @@ package de.chaos_darmstadt.schlafwandler.SeCam;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
@@ -24,6 +26,10 @@ import java.util.List;
 public class SeCam extends Activity {
     private Preview mPreview;
     private Camera mCamera;
+    private SharedPreferences settings;
+    
+    private long mEncryptionKeyIds[] = null;
+    private String mEncryptedData = null;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +38,9 @@ public class SeCam extends Activity {
         // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         
+        settings = getPreferences(MODE_PRIVATE);
+                
         // Create our Preview view and set it as the content of our activity.
         mPreview = new Preview(this);
         setContentView(mPreview);
@@ -43,6 +50,12 @@ public class SeCam extends Activity {
     {
     	super.onResume();
 
+    	if (mEncryptionKeyIds == null)
+    	{
+    		Intent i = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
+    		startActivityForResult(i, Apg.SELECT_PUBLIC_KEYS);
+    	}
+    	
     	mCamera = Camera.open();
     	mPreview.setCamera(mCamera);
     }
@@ -64,39 +77,78 @@ public class SeCam extends Activity {
     		return true;
     	}
     	else
-    		return super.onKeyDown(keyCode, event);
+    		return super.onKeyDown(keyCode, event);    	
 	}
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+    	if (resultCode != Activity.RESULT_OK || data == null)
+        {
+            return;
+        }
+    	
+    	switch (requestCode)
+    	{
+    	case Apg.SELECT_PUBLIC_KEYS:
+    		mEncryptionKeyIds = data.getLongArrayExtra(Apg.EXTRA_SELECTION);
+    		break;
+    	case Apg.ENCRYPT_MESSAGE:
+    		mEncryptedData = data.getStringExtra(Apg.EXTRA_ENCRYPTED_MESSAGE);
+    		saveToFile(mEncryptedData);
+    		break;
+    	case Apg.SELECT_SECRET_KEY:
+    		break;
+    	case Apg.DECRYPT_MESSAGE:
+    		break;
+    	}
+    }
+    
+    boolean testApgAvailability()
+    {
+    	//TODO: implement me!
+    	//PackageInfo pi = context.getPackageManager().getPackageInfo("org.thialfihar.android.apg", 0);
+    	return false;
+    }
+    
+    void saveToFile(String data)
+    {
+		FileOutputStream f = null;	
+		
+		try { 
+			f = openFileOutput("test.jpg",0);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			f.write(data.getBytes());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		try {
+			f.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
     
 	PictureCallback onPictureTakenJPEG = new PictureCallback() {	
 		public void onPictureTaken(byte[] data,Camera cam)
 		{
-			FileOutputStream f = null;
-			try {
-				 f = openFileOutput("test.jpg",0);
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+
+			Intent ear = new Intent(Apg.Intent.ENCRYPT_AND_RETURN);
 			
-			try {
-				f.write(data);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			ear.setType("application/octet-stream");
+			ear.putExtra(Apg.EXTRA_DATA, data);
+			ear.putExtra(Apg.EXTRA_ENCRYPTION_KEY_IDS, mEncryptionKeyIds);
 			
-			try {
-				f.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			startActivityForResult(ear, Apg.ENCRYPT_MESSAGE);
 			
 			cam.startPreview();
 			return;
 		}
 	};    
-
 }
 
 // ----------------------------------------------------------------------
