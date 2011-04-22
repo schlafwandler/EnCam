@@ -10,11 +10,15 @@ import android.hardware.Camera.Size;
 import android.os.Bundle;
 import android.view.Display;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,7 +30,6 @@ import java.util.List;
 public class SeCam extends Activity {
     private Preview mPreview;
     private Camera mCamera;
-    private SharedPreferences settings;
     
     private long mEncryptionKeyIds[] = null;
     private String mEncryptedData = null;
@@ -38,28 +41,28 @@ public class SeCam extends Activity {
         // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        
-        settings = getPreferences(MODE_PRIVATE);
-                
+                        
         // Create our Preview view and set it as the content of our activity.
         mPreview = new Preview(this);
         setContentView(mPreview);
     }
     
+    @Override
     public void onResume()
     {
     	super.onResume();
 
     	if (mEncryptionKeyIds == null)
     	{
-    		Intent i = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
-    		startActivityForResult(i, Apg.SELECT_PUBLIC_KEYS);
+    		Toast noKeys = Toast.makeText(getApplicationContext(), getString(R.string.noKeySelectedWarning), Toast.LENGTH_LONG);
+    		noKeys.show();
     	}
     	
     	mCamera = Camera.open();
     	mPreview.setCamera(mCamera);
     }
     
+    @Override
     public void onPause()
     {
     	super.onPause();
@@ -69,6 +72,32 @@ public class SeCam extends Activity {
     	mPreview.setCamera(null);
     }
 
+    @Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getMenuInflater();
+		inflater.inflate(R.menu.mainmenu, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId())
+		{
+		case R.id.selectKeys:
+    		Intent select = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
+    		startActivityForResult(select, Apg.SELECT_PUBLIC_KEYS);
+			return true;
+		case R.id.preferences:
+			Intent pref = new Intent(SeCam.this, Preferences.class);
+			startActivity(pref);
+
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}		
+	}
+    
+	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) 
     {
     	if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && mCamera != null)
@@ -80,6 +109,7 @@ public class SeCam extends Activity {
     		return super.onKeyDown(keyCode, event);    	
 	}
     
+	@Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
     	if (resultCode != Activity.RESULT_OK || data == null)
@@ -131,6 +161,16 @@ public class SeCam extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+    }
+    
+    boolean saveToFileExternal(String data)
+    {
+    	return true;
+    }
+    
+    boolean saveToFileInternal(String data)
+    {
+    	return true;
     }
     
 	PictureCallback onPictureTakenJPEG = new PictureCallback() {	

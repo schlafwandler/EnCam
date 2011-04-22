@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, SeCam!</string>
+    
     <string name="app_name">SeCam</string>
+	<string name="noKeySelectedWarning">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
 </resources>
