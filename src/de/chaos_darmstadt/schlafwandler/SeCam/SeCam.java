@@ -41,7 +41,9 @@ public class SeCam extends Activity {
         // Hide the window title.
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-                        
+       
+    	loadSelectedKeys();
+
         // Create our Preview view and set it as the content of our activity.
         mPreview = new Preview(this);
         setContentView(mPreview);
@@ -51,7 +53,7 @@ public class SeCam extends Activity {
     public void onResume()
     {
     	super.onResume();
-
+    	
     	if (mEncryptionKeyIds == null)
     	{
     		Toast noKeys = Toast.makeText(getApplicationContext(), getString(R.string.noKeySelectedWarning), Toast.LENGTH_LONG);
@@ -70,6 +72,8 @@ public class SeCam extends Activity {
     	mCamera.release();
     	mCamera = null;
     	mPreview.setCamera(null);
+    	
+    	saveSelectedKeys();
     }
 
     @Override
@@ -85,6 +89,7 @@ public class SeCam extends Activity {
 		{
 		case R.id.selectKeys:
     		Intent select = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
+    		select.putExtra(Apg.EXTRA_SELECTION, mEncryptionKeyIds);
     		startActivityForResult(select, Apg.SELECT_PUBLIC_KEYS);
 			return true;
 		case R.id.preferences:
@@ -138,6 +143,45 @@ public class SeCam extends Activity {
     	//TODO: implement me!
     	//PackageInfo pi = context.getPackageManager().getPackageInfo("org.thialfihar.android.apg", 0);
     	return false;
+    }
+    
+    boolean loadSelectedKeys()
+    {
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	
+    	String serial = settings.getString("publicKeys", "");
+    	
+    	if (serial == "")
+    		return false;
+    	
+    	String[] sKeys = serial.split("\\s");
+    	mEncryptionKeyIds = new long[sKeys.length];
+    	
+    	for (int i=0;i<sKeys.length;i++)
+    	{
+    		mEncryptionKeyIds[i] = Long.parseLong(sKeys[i]);    		
+    	}
+    		
+    	return true;
+    }
+    
+    void saveSelectedKeys()
+    {
+    	StringBuffer serial = new StringBuffer();
+    	
+    	if (mEncryptionKeyIds == null)
+    		return;
+    	
+    	for (Long key : mEncryptionKeyIds)
+    	{
+    		serial.append(key);
+    	}
+    	
+    	SharedPreferences settings = getPreferences(MODE_PRIVATE);
+    	SharedPreferences.Editor editor = settings.edit();
+
+    	editor.putString("publicKeys", serial.toString());
+    	editor.commit();
     }
     
     void saveToFile(String data)
