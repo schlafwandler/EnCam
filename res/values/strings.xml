@@ -2,5 +2,8 @@
 <resources>
     
     <string name="app_name">SeCam</string>
-	<string name="noKeySelectedWarning">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
+	
+<string name="error_fileSaveError">An error orrured while saving the photo</string><string name="warning_noKeySelected">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
+<string name="warning_noExternalStorage">No SDcard or similar stoarge found, using internal storage</string>
+<string name="saveDirNameDefault">Encrypted Pictures</string>
 </resources>

@@ -8,6 +8,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.hardware.Camera.Size;
 import android.os.Bundle;
+import android.os.Environment;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -20,10 +21,13 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import java.util.Random;
 
 // ----------------------------------------------------------------------
 
@@ -33,6 +37,8 @@ public class SeCam extends Activity {
     
     private long mEncryptionKeyIds[] = null;
     private String mEncryptedData = null;
+    
+    private Random mPRNG = null;
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +53,9 @@ public class SeCam extends Activity {
         // Create our Preview view and set it as the content of our activity.
         mPreview = new Preview(this);
         setContentView(mPreview);
+        
+        // new random number generator (not secure, for file names only)
+        mPRNG = new Random();
     }
     
     @Override
@@ -56,7 +65,7 @@ public class SeCam extends Activity {
     	
     	if (mEncryptionKeyIds == null)
     	{
-    		Toast noKeys = Toast.makeText(getApplicationContext(), getString(R.string.noKeySelectedWarning), Toast.LENGTH_LONG);
+    		Toast noKeys = Toast.makeText(getApplicationContext(), getString(R.string.warning_noKeySelected), Toast.LENGTH_LONG);
     		noKeys.show();
     	}
     	
@@ -184,43 +193,63 @@ public class SeCam extends Activity {
     	editor.commit();
     }
     
-    void saveToFile(String data)
+    void saveToFile(String data) 
     {
-		FileOutputStream f = null;	
-		
-		try { 
-			f = openFileOutput("test.jpg",0);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		
+    	String state = Environment.getExternalStorageState();
+    	File file = null;
+    	
+    	if (Environment.MEDIA_MOUNTED.equals(state))
+    	{
+    		// try till one random name is free
+    		do {
+    			//file = new File(Environment.getExternalStoragePublicDirectory(getString(R.string.saveDirNameDefault)), getSaveFileName());
+    			file = new File(getExternalFilesDir(getString(R.string.saveDirNameDefault)), getSaveFileName());
+    		}
+    		while (file.exists());
+    	}
+    	else
+    	{
+    		Toast.makeText(getApplicationContext(), getString(R.string.warning_noExternalStorage), Toast.LENGTH_LONG).show();
+    	}
+    	
+    	if (file == null)
+    	{
+    		Toast.makeText(getApplicationContext(), getString(R.string.error_fileSaveError), Toast.LENGTH_LONG).show();
+    		return;
+    	}
+    	
+    	OutputStream os;
 		try {
-			f.write(data.getBytes());
+			os = new FileOutputStream(file);
+		} catch (FileNotFoundException e1) {
+    		Toast.makeText(getApplicationContext(), getString(R.string.error_fileSaveError), Toast.LENGTH_LONG).show();
+    		return;
+		}	
+				
+		try {
+			os.write(data.getBytes());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			f.close();
+			os.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		file.setLastModified(461523600000L);
     }
     
-    boolean saveToFileExternal(String data)
+    // generates a pseudorandom file name (.ejpg for encrypted jpeg)
+    String getSaveFileName()
     {
-    	return true;
+    	return Integer.toHexString(mPRNG.nextInt()) + ".ejpg";
     }
-    
-    boolean saveToFileInternal(String data)
-    {
-    	return true;
-    }
-    
+        
 	PictureCallback onPictureTakenJPEG = new PictureCallback() {	
 		public void onPictureTaken(byte[] data,Camera cam)
 		{
-
 			Intent ear = new Intent(Apg.Intent.ENCRYPT_AND_RETURN);
 			
 			ear.setType("application/octet-stream");
