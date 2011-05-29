@@ -33,7 +33,7 @@ import java.util.Random;
 
 public class SeCam extends Activity {
     private Preview mPreview;
-    private Camera mCamera;
+//    private Camera mCamera;
     
     private long mEncryptionKeyIds[] = null;
     private String mEncryptedData = null;
@@ -69,19 +69,13 @@ public class SeCam extends Activity {
     		noKeys.show();
     	}
     	
-    	mCamera = Camera.open();
-    	mPreview.setCamera(mCamera);
     }
     
     @Override
     public void onPause()
     {
     	super.onPause();
-    	
-    	mCamera.release();
-    	mCamera = null;
-    	mPreview.setCamera(null);
-    	
+    	    	
     	saveSelectedKeys();
     }
 
@@ -114,6 +108,8 @@ public class SeCam extends Activity {
 	@Override
     public boolean onKeyDown(int keyCode, KeyEvent event) 
     {
+		Camera mCamera = mPreview.getCamera();
+		
     	if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER && mCamera != null)
     	{
     		mCamera.takePicture(null, null, this.onPictureTakenJPEG);
@@ -268,8 +264,9 @@ public class SeCam extends Activity {
 
 class Preview extends SurfaceView implements SurfaceHolder.Callback {
     SurfaceHolder mHolder;
-    Camera mCamera;
     Context context;
+    public Camera mCamera;
+
     
     Preview(Context context) {
         super(context);
@@ -281,16 +278,18 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         mHolder.addCallback(this);
         mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
     }
-    
-    public void setCamera(Camera mCamera)
+        
+    public Camera getCamera()
     {
-    	this.mCamera = mCamera;
+    	return this.mCamera;
     }
-
+    
+    
     public void surfaceCreated(SurfaceHolder holder) {
         // The Surface has been created, acquire the camera and tell it where
         // to draw.
-
+    	mCamera = Camera.open();
+    	
         try {
            mCamera.setPreviewDisplay(holder);
         } catch (IOException exception) {
@@ -305,7 +304,8 @@ class Preview extends SurfaceView implements SurfaceHolder.Callback {
         // important to release it when the activity is paused.
     	if (mCamera != null)
         {
-    		mCamera.stopPreview();        
+//    		mCamera.setPreviewCallback(null);
+    		mCamera.stopPreview();       
     		mCamera.release();
     		mCamera = null;
         }
