@@ -192,14 +192,29 @@ public class SeCam extends Activity {
     void saveToFile(String data) 
     {
     	String state = Environment.getExternalStorageState();
-    	File file = null;
+    	File file = null, dir = null;
+    	
+    	
     	
     	if (Environment.MEDIA_MOUNTED.equals(state))
     	{
+    		dir = Environment.getExternalStoragePublicDirectory(getString(R.string.saveDirNameDefault));
+    		
+    		if (!dir.exists())
+    		{
+    			if (!dir.mkdir())
+    			{
+    	    		Toast.makeText(getApplicationContext(), getString(R.string.error_fileSaveError), Toast.LENGTH_LONG).show();
+    	    		return;    				
+    			}
+    			dir.setLastModified(461523600000L);
+    		}
+    		
     		// try till one random name is free
     		do {
+    			
     			//file = new File(Environment.getExternalStoragePublicDirectory(getString(R.string.saveDirNameDefault)), getSaveFileName());
-    			file = new File(getExternalFilesDir(getString(R.string.saveDirNameDefault)), getSaveFileName());
+    			file = new File(dir, getSaveFileName());
     		}
     		while (file.exists());
     	}
