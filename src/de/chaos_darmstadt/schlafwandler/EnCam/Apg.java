@@ -1,4 +1,5 @@
-package de.chaos_darmstadt.schlafwandler.SeCam;
+package de.chaos_darmstadt.schlafwandler.EnCam;
+
 
 public class Apg
 {

@@ -1,4 +1,4 @@
-package de.chaos_darmstadt.schlafwandler.SeCam;
+package de.chaos_darmstadt.schlafwandler.EnCam;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,6 +20,7 @@ import android.view.SurfaceView;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Toast;
+import de.chaos_darmstadt.schlafwandler.EnCam.R;
 
 import java.io.File;
 import java.io.FileNotFoundException;
