@@ -32,7 +32,7 @@ import java.util.Random;
 
 // ----------------------------------------------------------------------
 
-public class SeCam extends Activity {
+public class EnCam extends Activity {
     private Preview mPreview;
 //    private Camera mCamera;
     
@@ -40,6 +40,8 @@ public class SeCam extends Activity {
     private String mEncryptedData = null;
     
     private Random mPRNG = null;
+    
+    
     
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,7 +99,7 @@ public class SeCam extends Activity {
     		startActivityForResult(select, Apg.SELECT_PUBLIC_KEYS);
 			return true;
 		case R.id.preferences:
-			Intent pref = new Intent(SeCam.this, Preferences.class);
+			Intent pref = new Intent(EnCam.this, Preferences.class);
 			startActivity(pref);
 
 			return true;
