@@ -1,0 +1,13 @@
+What is EnCam
+EnCam stands for ENcrypted CAMera. The EnCam project aims at creating a Camera App for Android that stores pictures in a (more) secure way. To achieve this goal, the pictures are encrypted using APG, a free OpenPGP implementation for Android, before they are written to the storage medium.
+
+EnCam was written with a common dilemma in mind that's often faced by political activists: on one hand, pictures of protest, demonstrations or actions have proven to be extremely powerful at bringing movements to public attention (national or worldwide), mobilizing more people an being used as evidence for police violence. On the other hand, such pictures can easily fall in the hand of repressive forces and ending being used to identify other protesters, putting them at risk.
+EnCam tries to resolve this dilemma:  
+
+Use case 1:
+
+Use case 2:
+
+alpha software!!
+
+           

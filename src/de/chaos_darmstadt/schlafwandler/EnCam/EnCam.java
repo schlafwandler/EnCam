@@ -41,8 +41,6 @@ public class EnCam extends Activity {
     
     private Random mPRNG = null;
     
-    
-    
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
