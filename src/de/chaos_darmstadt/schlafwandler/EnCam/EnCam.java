@@ -7,6 +7,7 @@ import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,6 +30,7 @@ import java.util.Random;
 
 public class EnCam extends Activity {
     private Preview mPreview;
+    private SharedPreferences mPrefs;
 //    private Camera mCamera;
     
     private long mEncryptionKeyIds[] = null;
@@ -46,9 +48,7 @@ public class EnCam extends Activity {
        
     	loadSelectedKeys();
 
-        // Create our Preview view and set it as the content of our activity.
-        //mPreview = new Preview(this);
-        //setContentView(mPreview);
+    	mPrefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
     	
     	setContentView(R.layout.main);
     	mPreview = (Preview)findViewById(R.id.preview);
@@ -202,11 +202,10 @@ public class EnCam extends Activity {
     	String state = Environment.getExternalStorageState();
     	File file = null, dir = null;
     	
-    	
-    	
+    	    	
     	if (Environment.MEDIA_MOUNTED.equals(state))
     	{
-    		dir = Environment.getExternalStoragePublicDirectory(getString(R.string.saveDirNameDefault));
+    		dir = Environment.getExternalStoragePublicDirectory(mPrefs.getString("savePicturesPath", "Encrypted Pictures"));
     		
     		if (!dir.exists())
     		{

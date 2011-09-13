@@ -1,7 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:key="localStorage" android:title="Save File"><!-- <EditTextPreference android:key="Path" android:title="Directory" android:summary="Where your photos are stored on the SD card"></EditTextPreference> -->
+<PreferenceCategory android:key="localStorage" android:title="Save File">
+<EditTextPreference 
+				android:key="savePicturesPath"
+				android:title="Path" 
+				android:defaultValue="Encrypted Pictures"
+				android:summary="Where your photos are stored on the SD card">
+</EditTextPreference> 
 
 
 <!-- <CheckBoxPreference android:summary="Try saving photos on Internal Storage if no removable storage media (SD card) is availible" android:key="internalFallback" android:title="Revert to Internal Storage"></CheckBoxPreference> -->

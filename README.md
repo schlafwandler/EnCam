@@ -35,7 +35,7 @@ The need to take pictures without risking these pictures falling into the wrong 
 different situations, especially during political work.
 For example, it is a common problem during political protest that on one hand pictures are needed for documentation, evidence 
 or to bring events to public attention, while on the other hand these pictures can fall into the hands of 
-rogue police force or worse, putting political activists in danger.
+rogue police forces or worse, putting political activists in danger.
 
 EnCam is intended as a tool to lower the risk of taking pictures in such situations.
 
