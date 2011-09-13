@@ -84,6 +84,10 @@ By now, I can not rule out that an unencrypted copy of the data remains in
 the phones RAM after the encryption process. It *might* be possible to read
 out the phones RAM and reconstruct the original picture.
 
+## Known bugs
+
+* there is a problem with some custom ROMs. EnCam starts normally, but no pictures can be taken. Cause is unknown by now.
+
 ## Future development
 
 * implement zoom
