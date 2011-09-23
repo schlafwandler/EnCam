@@ -31,7 +31,6 @@ import java.util.Random;
 public class EnCam extends Activity {
     private Preview mPreview;
     private SharedPreferences mPrefs;
-//    private Camera mCamera;
     
     private long mEncryptionKeyIds[] = null;
     private String mEncryptedData = null;
@@ -218,9 +217,7 @@ public class EnCam extends Activity {
     		}
     		
     		// try till one random name is free
-    		do {
-    			
-    			//file = new File(Environment.getExternalStoragePublicDirectory(getString(R.string.saveDirNameDefault)), getSaveFileName());
+    		do {    			
     			file = new File(dir, getSaveFileName());
     		}
     		while (file.exists());
