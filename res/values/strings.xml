@@ -1,10 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    
+
     <string name="app_name">EnCam</string>
-	
-<string name="error_fileSaveError">An error orrured while saving the photo</string><string name="warning_noKeySelected">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
-<string name="warning_noExternalStorage">No SDcard or similar storage found, using internal storage</string>
-<string name="saveDirNameDefault">Encrypted Pictures</string>
-<string name="takePictureButton_Text">CLICK</string>
+    <string name="app_version">0.1</string>
+    <string name="error_fileSaveError">An error orrured while saving the photo</string>
+    <string name="warning_noKeySelected">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
+    <string name="warning_noExternalStorage">No SDcard or similar storage found, using internal storage</string>
+    <string name="warning_noApg">APG is not installed. This app requires APG to work. Click Close to go to Android Market and close this App.</string><string name="saveDirNameDefault">Encrypted Pictures</string>
+    <string name="preferences">Preferences</string>
+    <string name="selectKeys">Select Keys</string>
+    <string name="about">About</string>
+    <string name="aboutText">by Schlafwandler and Pogdi</string>
+    <string name="help">Help</string>
+    <string name="helpText">&lt;big>Select Keys&lt;/big>&lt;br />Go Menu &lt;i>Select public keys&lt;/i> and check the keys you want your pictures to be encrypted with.&lt;br />&lt;br />&lt;big>Take pictures&lt;/big>&lt;br />You can take pictures tapping either anywhere on the screen or the Directional Pad Center key (if your phone has one). The pictures are encrypted on the fly and saved in a folder on the storage medium you can define in &lt;i>Preferences&lt;/i>. The default folder is &lt;i>Encrypted Pictures&lt;/i>. The filename is generated randomly, the suffix is always &lt;i>.ejpg&lt;/i>.&lt;br />&lt;br />&lt;big>Decrypt photos&lt;/big>&lt;br />The encrypted photographs are stored in the described folder on the SD-Card. They can be copied to any computer and decrypted using gpg.&lt;br />You should store the decrypted pictures only on secured media, like an encrypted drive.</string>
+    <string name="close">Close</string>
+    <string name="chooseKey">Choose Key...</string>
+    
+    
+
 </resources>

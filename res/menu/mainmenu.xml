@@ -3,4 +3,6 @@
   xmlns:android="http://schemas.android.com/apk/res/android">
 <item android:title="Select Keys" android:id="@+id/selectKeys"></item>
 <item android:id="@+id/preferences" android:title="Preferences"></item>
+<item android:id="@+id/about" android:title="@string/about"></item><item android:id="@+id/help" android:title="@string/help"></item>
+
 </menu>

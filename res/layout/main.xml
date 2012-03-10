@@ -9,13 +9,12 @@
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content">
 	</de.chaos_darmstadt.schlafwandler.EnCam.Preview>
-	<Button 
-		android:layout_height="wrap_content" 
-		android:layout_width="wrap_content" 
-		android:layout_alignParentBottom="true"
-		android:layout_centerHorizontal="true" 
-		android:text="@string/takePictureButton_Text" 
-		android:id="@+id/TakePictureButton"
-		android:onClick="onTakePictureButton">
-		</Button>
+    <Button
+        android:id="@+id/TakePictureButton"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="#00FFFFFF"
+        android:onClick="onTakePictureButton" />
 </RelativeLayout>

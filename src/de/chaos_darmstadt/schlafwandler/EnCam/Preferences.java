@@ -7,7 +7,7 @@ import de.chaos_darmstadt.schlafwandler.EnCam.R;
 public class Preferences extends PreferenceActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-	    super.onCreate(savedInstanceState);
-	    addPreferencesFromResource(R.xml.preference);
+		super.onCreate(savedInstanceState);
+		addPreferencesFromResource(R.xml.preference);
 	}
 }
