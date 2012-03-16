@@ -79,20 +79,19 @@ public class UploadService extends IntentService {
 		Intent broadcastIntent = new Intent();
 		broadcastIntent.setAction(ResponseReceiver.ACTION_RESP);
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+		int result = 0;
 
 		switch (intent.getIntExtra(KIND, KIND_NONE)) {
 		case KIND_MAIL:
-			broadcastIntent.putExtra(RESULT,
-					sendMail(intent.getStringArrayExtra(CONNECTION_DATA)));
+			result = sendMail(intent.getStringArrayExtra(CONNECTION_DATA));
 			break;
 		case KIND_FTP:
-			broadcastIntent.putExtra(RESULT,
-					ftpUpload(intent.getStringArrayExtra(CONNECTION_DATA)));
+			result = ftpUpload(intent.getStringArrayExtra(CONNECTION_DATA));
 			break;
 		default:
 
 		}
-
+		broadcastIntent.putExtra(RESULT, result);
 		sendBroadcast(broadcastIntent);
 
 	}

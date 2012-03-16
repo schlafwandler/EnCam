@@ -123,7 +123,6 @@ public class EnCam extends Activity {
 		case R.id.selectKeys:
 			selectKeys();
 			return true;
-			// TODO: error on no selection-> array doesnt work then
 		case R.id.preferences:
 			Intent pref = new Intent(EnCam.this, Preferences.class);
 			startActivity(pref);

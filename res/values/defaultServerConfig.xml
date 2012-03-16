@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
 <!--     this file defines the default server config. It's used, if the preferences remain empty and gets compiled
 if you don't want your server settings to be easily retrievable, compile with a costom config, but mind: the connection data can still be sniffed -->
 
+
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
     <string name="config_enableMail">false</string>
     <string name="config_mailTo"></string>
     <string name="config_mailSubject">EnCam</string>

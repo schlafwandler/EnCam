@@ -8,7 +8,5 @@ public class Preferences extends PreferenceActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.preference);
-
-		// TODO: disable mail settings if enableMail == false
 	}
 }

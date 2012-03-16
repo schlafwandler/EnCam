@@ -40,8 +40,6 @@ public final class R {
         public static final int app_version=0x7f060011;
         public static final int bt_chooseKey=0x7f06003f;
         public static final int config_enableFtp=0x7f060009;
-        /**      this file defines the default server config. It's used, if the preferences remain empty 
-         */
         public static final int config_enableMail=0x7f060000;
         public static final int config_enableShare=0x7f06000f;
         public static final int config_ftpDirectory=0x7f06000e;
