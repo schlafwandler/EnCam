@@ -5,10 +5,12 @@
     android:versionName="@string/app_version">
 
     <uses-sdk android:minSdkVersion="8" />
+    <uses-feature android:name="android.hardware.camera" />
     <uses-permission android:name="android.permission.CAMERA" >
     </uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" >
     </uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:debuggable="true"
@@ -31,6 +33,9 @@
             android:name="de.chaos_darmstadt.schlafwandler.EnCam.Help"
             android:label="Help" >
         </activity>
+       <service android:name=".UploadService"
+        android:process=":upload"
+        android:exported="false" />
     </application>
 
 </manifest>

@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="@string/help"
+        android:text="@string/menu_help"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <TextView

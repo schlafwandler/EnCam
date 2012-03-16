@@ -10,8 +10,11 @@ import java.util.Random;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Camera;
@@ -43,9 +46,11 @@ public class EnCam extends Activity {
 	static final int DIALOG_CHECKAPG_ID = 1;
 	static final int DIALOG_NOKEYS_ID = 2;
 
-	static final String APP_NAME = "EnCam";
+	String APP_NAME;
 	static final String APP_PACKAGE = "de.chaos_darmstadt.schlafwandler.EnCam";
 	String APP_VERSION;
+
+	private ResponseReceiver receiver;
 
 	private Random mPRNG = null;
 
@@ -61,7 +66,7 @@ public class EnCam extends Activity {
 		loadSelectedKeys();
 
 		mPrefs = PreferenceManager
-				.getDefaultSharedPreferences(getBaseContext());
+				.getDefaultSharedPreferences(getApplicationContext());
 
 		setContentView(R.layout.main);
 		mPreview = (Preview) findViewById(R.id.preview);
@@ -73,25 +78,36 @@ public class EnCam extends Activity {
 		mPRNG = new Random();
 
 		APP_VERSION = getString(R.string.app_version);
+		APP_NAME = getString(R.string.app_name);
 
 		if (!testApgAvailability())
 			showDialog(DIALOG_CHECKAPG_ID);
 
+		IntentFilter filter = new IntentFilter(ResponseReceiver.ACTION_RESP);
+		filter.addCategory(Intent.CATEGORY_DEFAULT);
+		receiver = new ResponseReceiver();
+		registerReceiver(receiver, filter);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+
 		if (mEncryptionKeyIds == null)
 			showDialog(DIALOG_NOKEYS_ID);
+
+		IntentFilter filter = new IntentFilter(ResponseReceiver.ACTION_RESP);
+		filter.addCategory(Intent.CATEGORY_DEFAULT);
+		registerReceiver(receiver, filter);
 
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-
 		saveSelectedKeys();
+		unregisterReceiver(receiver);
+
 	}
 
 	@Override
@@ -105,9 +121,7 @@ public class EnCam extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.selectKeys:
-			Intent select = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
-			select.putExtra(Apg.EXTRA_SELECTION, mEncryptionKeyIds);
-			startActivityForResult(select, Apg.SELECT_PUBLIC_KEYS);
+			selectKeys();
 			return true;
 			// TODO: error on no selection-> array doesnt work then
 		case R.id.preferences:
@@ -126,15 +140,22 @@ public class EnCam extends Activity {
 		}
 	}
 
+	private void selectKeys() {
+		Intent select = new Intent(Apg.Intent.SELECT_PUBLIC_KEYS);
+		select.putExtra(Apg.EXTRA_SELECTION, mEncryptionKeyIds);
+		startActivityForResult(select, Apg.SELECT_PUBLIC_KEYS);
+	}
+
 	protected Dialog aboutDialog() {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle(
-				getString(R.string.about) + " " + APP_NAME + " " + APP_VERSION)
+				getString(R.string.menu_about) + " " + APP_NAME + " "
+						+ APP_VERSION)
 				.setMessage(
-						Html.fromHtml(getString(R.string.aboutText).replaceAll(
-								"lt;", "<")))
+						Html.fromHtml(getString(R.string.about_text)
+								.replaceAll("lt;", "<")))
 				.setCancelable(false)
-				.setNeutralButton(getString(R.string.close),
+				.setNeutralButton(getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dismissDialog(DIALOG_ABOUT_ID);
@@ -148,7 +169,7 @@ public class EnCam extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.warning_noApg))
 				.setCancelable(false)
-				.setNeutralButton(getString(R.string.close),
+				.setNeutralButton(getString(android.R.string.ok),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								Intent openMarket = new Intent(
@@ -167,16 +188,11 @@ public class EnCam extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.warning_noKeySelected))
 				.setCancelable(false)
-				.setNeutralButton(getString(R.string.chooseKey),
+				.setNeutralButton(getString(R.string.bt_chooseKey),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dismissDialog(DIALOG_NOKEYS_ID);
-								Intent select = new Intent(
-										Apg.Intent.SELECT_PUBLIC_KEYS);
-								select.putExtra(Apg.EXTRA_SELECTION,
-										mEncryptionKeyIds);
-								startActivityForResult(select,
-										Apg.SELECT_PUBLIC_KEYS);
+								selectKeys();
 							}
 						});
 		AlertDialog noKeysDialog = builder.create();
@@ -288,13 +304,11 @@ public class EnCam extends Activity {
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			dir = Environment.getExternalStoragePublicDirectory(mPrefs
-					.getString("savePicturesPath", "Encrypted Pictures"));
+					.getString("pref_path", "Encrypted Pictures"));
 
 			if (!dir.exists()) {
 				if (!dir.mkdir()) {
-					Toast.makeText(getApplicationContext(),
-							getString(R.string.error_fileSaveError),
-							Toast.LENGTH_LONG).show();
+					notify(R.string.error_fileSaveError);
 					return;
 				}
 				dir.setLastModified(461523600000L);
@@ -305,15 +319,11 @@ public class EnCam extends Activity {
 				file = new File(dir, getSaveFileName());
 			} while (file.exists());
 		} else {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.warning_noExternalStorage),
-					Toast.LENGTH_LONG).show();
+			notify(R.string.warning_noExternalStorage);
 		}
 
 		if (file == null) {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.error_fileSaveError), Toast.LENGTH_LONG)
-					.show();
+			notify(R.string.error_fileSaveError);
 			return;
 		}
 
@@ -321,9 +331,7 @@ public class EnCam extends Activity {
 		try {
 			os = new FileOutputStream(file);
 		} catch (FileNotFoundException e1) {
-			Toast.makeText(getApplicationContext(),
-					getString(R.string.error_fileSaveError), Toast.LENGTH_LONG)
-					.show();
+			notify(R.string.error_fileSaveError);
 			return;
 		}
 
@@ -340,11 +348,96 @@ public class EnCam extends Activity {
 		}
 
 		file.setLastModified(461523600000L);
+		if (mPrefs.getString("enableMail",
+				getString(R.string.config_enableMail)).equals("true"))
+			upload(file.getAbsolutePath(), UploadService.KIND_MAIL);
+		if (mPrefs.getString("enableFtp", getString(R.string.config_enableFtp))
+				.equals("true"))
+			upload(file.getAbsolutePath(), UploadService.KIND_FTP);
+		if (mPrefs.getString("enableShare",
+				getString(R.string.config_enableShare)).equals("true"))
+			upload(file.getAbsolutePath(), UploadService.KIND_SHARE);
+
+	}
+
+	public void upload(String path, int kind) {
+		String[] data;
+
+		switch (kind) {
+		case UploadService.KIND_MAIL:
+			data = new String[] {
+					path,
+					mPrefs.getString("mailTo",
+							getString(R.string.config_mailTo)),
+					mPrefs.getString("mailSubject",
+							getString(R.string.config_mailSubject)),
+					mPrefs.getString("mailBody",
+							getString(R.string.config_mailBody)),
+					mPrefs.getString("mailFrom",
+							getString(R.string.config_mailFrom)),
+					mPrefs.getString("mailHost",
+							getString(R.string.config_mailHost)),
+					mPrefs.getString("mailPort",
+							getString(R.string.config_mailPort)),
+					mPrefs.getString("mailUser",
+							getString(R.string.config_mailUser)),
+					mPrefs.getString("mailPassword",
+							getString(R.string.config_mailPassword)),
+					mPrefs.getString("mailSsl", "false") };
+			break;
+		case UploadService.KIND_FTP:
+			data = new String[] {
+					path,
+					mPrefs.getString("ftpHost",
+							getString(R.string.config_ftpHost)),
+					mPrefs.getString("ftpPort",
+							getString(R.string.config_ftpPort)),
+					mPrefs.getString("ftpUser",
+							getString(R.string.config_ftpUser)),
+					mPrefs.getString("ftpPassword",
+							getString(R.string.config_ftpPassword)),
+					mPrefs.getString("ftpDirectory",
+							getString(R.string.config_ftpDirectory)) };
+			break;
+		case UploadService.KIND_SHARE:
+			data = new String[] { path };
+			share(data);
+			break;
+		default:
+			data = new String[] {};
+		}
+
+		if (kind != UploadService.KIND_NONE && kind != UploadService.KIND_SHARE) {
+			Intent upload = new Intent(this, UploadService.class);
+			upload.putExtra(UploadService.KIND, kind);
+			upload.putExtra(UploadService.CONNECTION_DATA, data);
+			startService(upload);
+		}
+
+	}
+
+	private void share(String[] data) {
+		Intent shareIntent = new Intent(Intent.ACTION_SEND);
+		shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+		shareIntent.setType("application/octet-stream");
+
+		// For a file in shared storage. For data in private storage, use a
+		// ContentProvider.
+		Uri uri = new Uri.Builder().path(data[0]).build();
+		shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+		startActivity(Intent.createChooser(shareIntent,
+				getString(R.string.dialog_share)));
 	}
 
 	// generates a pseudorandom file name (.ejpg for encrypted jpeg)
 	String getSaveFileName() {
 		return Integer.toHexString(mPRNG.nextInt()) + ".ejpg";
+	}
+
+	private void notify(int string) {
+		Toast.makeText(getApplicationContext(), getString(string),
+				Toast.LENGTH_LONG).show();
 	}
 
 	PictureCallback onPictureTakenJPEG = new PictureCallback() {
@@ -361,6 +454,18 @@ public class EnCam extends Activity {
 			return;
 		}
 	};
+
+	public class ResponseReceiver extends BroadcastReceiver {
+		public static final String ACTION_RESP = "de.chaos_darmstadt.schlafwandler.EnCam.intent.action.MESSAGE_PROCESSED";
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			EnCam.this.notify(intent.getIntExtra(UploadService.RESULT,
+					R.string.error_mailSendError));
+		}
+
+	}
+
 }
 
 // ----------------------------------------------------------------------

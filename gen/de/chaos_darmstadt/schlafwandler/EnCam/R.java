@@ -14,38 +14,94 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int TakePictureButton=0x7f070003;
-        public static final int about=0x7f070006;
-        public static final int help=0x7f070007;
-        public static final int helpTextTextView=0x7f070001;
-        public static final int helpTextView=0x7f070000;
-        public static final int preferences=0x7f070005;
-        public static final int preview=0x7f070002;
-        public static final int selectKeys=0x7f070004;
+        public static final int TakePictureButton=0x7f080003;
+        public static final int about=0x7f080006;
+        public static final int help=0x7f080007;
+        public static final int helpTextTextView=0x7f080001;
+        public static final int helpTextView=0x7f080000;
+        public static final int preferences=0x7f080005;
+        public static final int preview=0x7f080002;
+        public static final int selectKeys=0x7f080004;
     }
     public static final class layout {
         public static final int help=0x7f030000;
         public static final int main=0x7f030001;
     }
     public static final class menu {
-        public static final int mainmenu=0x7f060000;
+        public static final int mainmenu=0x7f070000;
+    }
+    public static final class raw {
+        public static final int mycert=0x7f050000;
+        public static final int mystore=0x7f050001;
     }
     public static final class string {
-        public static final int about=0x7f050009;
-        public static final int aboutText=0x7f05000a;
-        public static final int app_name=0x7f050000;
-        public static final int app_version=0x7f050001;
-        public static final int chooseKey=0x7f05000e;
-        public static final int close=0x7f05000d;
-        public static final int error_fileSaveError=0x7f050002;
-        public static final int help=0x7f05000b;
-        public static final int helpText=0x7f05000c;
-        public static final int preferences=0x7f050007;
-        public static final int saveDirNameDefault=0x7f050006;
-        public static final int selectKeys=0x7f050008;
-        public static final int warning_noApg=0x7f050005;
-        public static final int warning_noExternalStorage=0x7f050004;
-        public static final int warning_noKeySelected=0x7f050003;
+        public static final int about_text=0x7f06003c;
+        public static final int app_name=0x7f060010;
+        public static final int app_version=0x7f060011;
+        public static final int bt_chooseKey=0x7f06003f;
+        public static final int config_enableFtp=0x7f060009;
+        /**      this file defines the default server config. It's used, if the preferences remain empty 
+         */
+        public static final int config_enableMail=0x7f060000;
+        public static final int config_enableShare=0x7f06000f;
+        public static final int config_ftpDirectory=0x7f06000e;
+        public static final int config_ftpHost=0x7f06000a;
+        public static final int config_ftpPassword=0x7f06000d;
+        public static final int config_ftpPort=0x7f06000b;
+        public static final int config_ftpUser=0x7f06000c;
+        public static final int config_mailBody=0x7f060003;
+        public static final int config_mailFrom=0x7f060004;
+        public static final int config_mailHost=0x7f060005;
+        public static final int config_mailPassword=0x7f060008;
+        public static final int config_mailPort=0x7f060006;
+        public static final int config_mailSubject=0x7f060002;
+        public static final int config_mailTo=0x7f060001;
+        public static final int config_mailUser=0x7f060007;
+        public static final int dialog_share=0x7f060040;
+        public static final int error_fileSaveError=0x7f060012;
+        public static final int error_ftpUploadError=0x7f060014;
+        public static final int error_mailSendError=0x7f060013;
+        public static final int error_setFtpPreferences=0x7f060016;
+        public static final int error_setMailPreferences=0x7f060015;
+        public static final int help_text=0x7f06003e;
+        public static final int menu_about=0x7f06003b;
+        public static final int menu_help=0x7f06003d;
+        public static final int menu_selectKeys=0x7f06003a;
+        public static final int pref_compression=0x7f060039;
+        public static final int pref_enableShare=0x7f060038;
+        public static final int pref_ftp=0x7f06002e;
+        public static final int pref_ftpAccount=0x7f060031;
+        public static final int pref_ftpDirectory=0x7f060037;
+        public static final int pref_ftpEnable=0x7f06002f;
+        public static final int pref_ftpHost=0x7f060032;
+        public static final int pref_ftpPassword=0x7f060035;
+        public static final int pref_ftpPort=0x7f060033;
+        public static final int pref_ftpPreferences=0x7f060030;
+        public static final int pref_ftpSsl=0x7f060036;
+        public static final int pref_ftpUser=0x7f060034;
+        public static final int pref_mail=0x7f060020;
+        public static final int pref_mailAccount=0x7f060023;
+        public static final int pref_mailBody=0x7f06002d;
+        public static final int pref_mailContent=0x7f06002a;
+        public static final int pref_mailEnable=0x7f060021;
+        public static final int pref_mailFrom=0x7f060024;
+        public static final int pref_mailHost=0x7f060025;
+        public static final int pref_mailPassword=0x7f060028;
+        public static final int pref_mailPort=0x7f060026;
+        public static final int pref_mailPreferences=0x7f060022;
+        public static final int pref_mailSsl=0x7f060029;
+        public static final int pref_mailSubject=0x7f06002c;
+        public static final int pref_mailTo=0x7f06002b;
+        public static final int pref_mailUser=0x7f060027;
+        public static final int pref_path=0x7f06001d;
+        public static final int pref_pathDefault=0x7f06001e;
+        public static final int pref_preferences=0x7f06001c;
+        public static final int pref_upload=0x7f06001f;
+        public static final int success_ftpUpload=0x7f06001b;
+        public static final int success_mailSend=0x7f06001a;
+        public static final int warning_noApg=0x7f060019;
+        public static final int warning_noExternalStorage=0x7f060018;
+        public static final int warning_noKeySelected=0x7f060017;
     }
     public static final class xml {
         public static final int preference=0x7f040000;

@@ -12,7 +12,7 @@ public class Help extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.help);
 		TextView helpText = (TextView) findViewById(R.id.helpTextTextView);
-		helpText.setText(Html.fromHtml(getString(R.string.helpText).replaceAll(
-				"lt;", "<")));
+		helpText.setText(Html.fromHtml(getString(R.string.help_text)
+				.replaceAll("lt;", "<")));
 	}
 }
