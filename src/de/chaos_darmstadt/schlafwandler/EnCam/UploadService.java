@@ -79,7 +79,7 @@ public class UploadService extends IntentService {
 		Intent broadcastIntent = new Intent();
 		broadcastIntent.setAction(ResponseReceiver.ACTION_RESP);
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		int result = 0;
+		int result = R.string.error_generalError;
 
 		switch (intent.getIntExtra(KIND, KIND_NONE)) {
 		case KIND_MAIL:
@@ -88,8 +88,6 @@ public class UploadService extends IntentService {
 		case KIND_FTP:
 			result = ftpUpload(intent.getStringArrayExtra(CONNECTION_DATA));
 			break;
-		default:
-
 		}
 		broadcastIntent.putExtra(RESULT, result);
 		sendBroadcast(broadcastIntent);

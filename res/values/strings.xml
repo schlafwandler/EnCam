@@ -3,6 +3,7 @@
 
     <string name="app_name">EnCam</string>
     <string name="app_version">0.1</string>
+    <string name="error_generalError">A general error orrured while uploading. Try again.</string>
     <string name="error_fileSaveError">An error orrured while saving the photo!</string>
     <string name="error_mailSendError">An error orrured while sending the mail. Check your mail settings and internet connectivity.</string>
     <string name="error_ftpUploadError">An error orrured while uploading to the ftp server. Check your ftp settings and internet connectivity.</string>
