@@ -3,13 +3,23 @@
 
     <PreferenceCategory
         android:key="localStorage"
-        android:title="Save File" >
+        android:title="@string/pref_saveFile" >
         <EditTextPreference
             android:defaultValue="@string/pref_pathDefault"
             android:key="pref_path"
             android:summary="Where your photos are stored on the SD card"
             android:title="@string/pref_path" >
         </EditTextPreference>
+
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_dateEntries"
+            android:entryValues="@array/pref_dateValues"
+            android:key="date"
+            android:persistent="true"
+            android:shouldDisableView="false"
+            android:summary="@string/pref_dateDesc"
+            android:title="@string/pref_date" />
 
         <!-- <CheckBoxPreference android:summary="Try saving photos on Internal Storage if no removable storage media (SD card) is availible" android:key="internalFallback" android:title="Revert to Internal Storage"></CheckBoxPreference> -->
     </PreferenceCategory>

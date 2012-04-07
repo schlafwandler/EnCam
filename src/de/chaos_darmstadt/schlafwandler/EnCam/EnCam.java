@@ -53,6 +53,7 @@ public class EnCam extends Activity {
 	private ResponseReceiver receiver;
 
 	private Random mPRNG = null;
+	private Random random;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -92,8 +93,7 @@ public class EnCam extends Activity {
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		if (mEncryptionKeyIds == null)
+		if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0)
 			showDialog(DIALOG_NOKEYS_ID);
 
 		IntentFilter filter = new IntentFilter(ResponseReceiver.ACTION_RESP);
@@ -187,11 +187,18 @@ public class EnCam extends Activity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setMessage(getString(R.string.warning_noKeySelected))
 				.setCancelable(false)
-				.setNeutralButton(getString(R.string.bt_chooseKey),
+				.setPositiveButton(getString(R.string.bt_chooseKey),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 								dismissDialog(DIALOG_NOKEYS_ID);
 								selectKeys();
+							}
+						})
+				.setNegativeButton(getString(R.string.bt_close),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dismissDialog(DIALOG_NOKEYS_ID);
+								finish();
 							}
 						});
 		AlertDialog noKeysDialog = builder.create();
@@ -283,8 +290,9 @@ public class EnCam extends Activity {
 	void saveSelectedKeys() {
 		StringBuffer serial = new StringBuffer();
 
-		if (mEncryptionKeyIds == null)
+		if (mEncryptionKeyIds == null) {
 			return;
+		}
 
 		for (Long key : mEncryptionKeyIds) {
 			serial.append(key);
@@ -311,6 +319,7 @@ public class EnCam extends Activity {
 					return;
 				}
 				dir.setLastModified(461523600000L);
+				setDate(dir);
 			}
 
 			// try till one random name is free
@@ -346,7 +355,8 @@ public class EnCam extends Activity {
 			e.printStackTrace();
 		}
 
-		file.setLastModified(461523600000L);
+		// file.setLastModified(461523600000L);
+		setDate(file);
 		if (mPrefs.getString("enableMail",
 				getString(R.string.config_enableMail)).equals("true"))
 			upload(file.getAbsolutePath(), UploadService.KIND_MAIL);
@@ -357,6 +367,22 @@ public class EnCam extends Activity {
 				getString(R.string.config_enableShare)).equals("true"))
 			upload(file.getAbsolutePath(), UploadService.KIND_SHARE);
 
+	}
+
+	private void setDate(File file) {
+		String selection = mPrefs.getString("date", "random");
+		long time;
+		if (selection.equals("static")) {
+			time = 461523600000L;
+
+		} else if (selection.equals("actual")) {
+			time = System.currentTimeMillis();
+		} else {
+			random = new Random();
+			time = (long) (random.nextDouble() * (500000000000L));
+		}
+
+		file.setLastModified(time);
 	}
 
 	public void upload(String path, int kind) {
