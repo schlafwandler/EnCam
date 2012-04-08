@@ -14,7 +14,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.hardware.Camera;
@@ -50,8 +49,6 @@ public class EnCam extends Activity {
 	static final String APP_PACKAGE = "de.chaos_darmstadt.schlafwandler.EnCam";
 	String APP_VERSION;
 
-	private ResponseReceiver receiver;
-
 	private Random mPRNG = null;
 	private Random random;
 
@@ -84,10 +81,6 @@ public class EnCam extends Activity {
 		if (!testApgAvailability())
 			showDialog(DIALOG_CHECKAPG_ID);
 
-		IntentFilter filter = new IntentFilter(ResponseReceiver.ACTION_RESP);
-		filter.addCategory(Intent.CATEGORY_DEFAULT);
-		receiver = new ResponseReceiver();
-		registerReceiver(receiver, filter);
 	}
 
 	@Override
@@ -95,19 +88,12 @@ public class EnCam extends Activity {
 		super.onResume();
 		if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0)
 			showDialog(DIALOG_NOKEYS_ID);
-
-		IntentFilter filter = new IntentFilter(ResponseReceiver.ACTION_RESP);
-		filter.addCategory(Intent.CATEGORY_DEFAULT);
-		registerReceiver(receiver, filter);
-
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		saveSelectedKeys();
-		unregisterReceiver(receiver);
-
 	}
 
 	@Override
@@ -311,7 +297,7 @@ public class EnCam extends Activity {
 
 		if (Environment.MEDIA_MOUNTED.equals(state)) {
 			dir = Environment.getExternalStoragePublicDirectory(mPrefs
-					.getString("pref_path", "Encrypted Pictures"));
+					.getString("path", "Encrypted Pictures"));
 
 			if (!dir.exists()) {
 				if (!dir.mkdir()) {

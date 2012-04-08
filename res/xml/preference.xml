@@ -2,11 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory
-        android:key="localStorage"
+        android:key="files"
         android:title="@string/pref_saveFile" >
         <EditTextPreference
             android:defaultValue="@string/pref_pathDefault"
-            android:key="pref_path"
+            android:key="path"
             android:summary="Where your photos are stored on the SD card"
             android:title="@string/pref_path" >
         </EditTextPreference>

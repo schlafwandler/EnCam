@@ -8,7 +8,10 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import android.app.IntentService;
 import android.content.Intent;
-import de.chaos_darmstadt.schlafwandler.EnCam.EnCam.ResponseReceiver;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.widget.Toast;
 
 public class UploadService extends IntentService {
 	static final int KIND_NONE = 0;
@@ -42,6 +45,7 @@ public class UploadService extends IntentService {
 		} catch (Exception e) {
 			return R.string.error_mailSendError;
 		}
+
 		return R.string.success_mailSend;
 	}
 
@@ -76,9 +80,6 @@ public class UploadService extends IntentService {
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		Intent broadcastIntent = new Intent();
-		broadcastIntent.setAction(ResponseReceiver.ACTION_RESP);
-		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 		int result = R.string.error_generalError;
 
 		switch (intent.getIntExtra(KIND, KIND_NONE)) {
@@ -89,8 +90,28 @@ public class UploadService extends IntentService {
 			result = ftpUpload(intent.getStringArrayExtra(CONNECTION_DATA));
 			break;
 		}
-		broadcastIntent.putExtra(RESULT, result);
-		sendBroadcast(broadcastIntent);
+
+		// toast test begin
+		Message msg = new Message();
+		Bundle bdl = new Bundle();
+		bdl.putInt("result", result);
+		msg.setData(bdl);
+		handler.sendMessage(msg);
+		// toast test end
 
 	}
+
+	// toast test method
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			Toast.makeText(
+					getApplicationContext(),
+					getString(msg.getData().getInt("result",
+							R.string.error_generalError)), Toast.LENGTH_LONG)
+					.show(); // TODO result doesnt work yet, if sucessfully
+								// finished force-close
+		}
+	};
+
 }
