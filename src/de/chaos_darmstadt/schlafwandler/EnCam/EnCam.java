@@ -226,9 +226,6 @@ public class EnCam extends Activity {
 	}
 
 	public void onTakePictureButton(View v) {
-		// upload("test");
-		upload("/mnt/sdcard/devicefriendlyname.txt");
-
 		Camera mCamera = mPreview.getCamera();
 		mCamera.takePicture(null, null, this.onPictureTakenJPEG);
 	}
