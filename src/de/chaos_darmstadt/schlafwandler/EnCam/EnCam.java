@@ -5,13 +5,13 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,8 +33,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
 
-// ----------------------------------------------------------------------
-
 public class EnCam extends Activity {
 	private Preview mPreview;
 	private SharedPreferences mPrefs;
@@ -51,6 +49,8 @@ public class EnCam extends Activity {
 
 	private Random mPRNG = null;
 	private Random random;
+
+	private Queue<String> failedUploads;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,12 +88,14 @@ public class EnCam extends Activity {
 		super.onResume();
 		if (mEncryptionKeyIds == null || mEncryptionKeyIds.length == 0)
 			showDialog(DIALOG_NOKEYS_ID);
+		parseFailedUploads();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		saveSelectedKeys();
+		saveFailedUploads();
 	}
 
 	@Override
@@ -119,6 +121,9 @@ public class EnCam extends Activity {
 			return true;
 		case R.id.about:
 			showDialog(DIALOG_ABOUT_ID);
+			return true;
+		case R.id.uploads:
+			retryFailedUploads();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -221,6 +226,9 @@ public class EnCam extends Activity {
 	}
 
 	public void onTakePictureButton(View v) {
+		// upload("test");
+		upload("/mnt/sdcard/devicefriendlyname.txt");
+
 		Camera mCamera = mPreview.getCamera();
 		mCamera.takePicture(null, null, this.onPictureTakenJPEG);
 	}
@@ -274,6 +282,10 @@ public class EnCam extends Activity {
 	}
 
 	void saveSelectedKeys() {
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+
+		SharedPreferences.Editor editor = settings.edit();
+
 		StringBuffer serial = new StringBuffer();
 
 		if (mEncryptionKeyIds == null) {
@@ -283,9 +295,6 @@ public class EnCam extends Activity {
 		for (Long key : mEncryptionKeyIds) {
 			serial.append(key);
 		}
-
-		SharedPreferences settings = getPreferences(MODE_PRIVATE);
-		SharedPreferences.Editor editor = settings.edit();
 
 		editor.putString("publicKeys", serial.toString());
 		editor.commit();
@@ -341,18 +350,8 @@ public class EnCam extends Activity {
 			e.printStackTrace();
 		}
 
-		// file.setLastModified(461523600000L);
 		setDate(file);
-		if (mPrefs.getString("enableMail",
-				getString(R.string.config_enableMail)).equals("true"))
-			upload(file.getAbsolutePath(), UploadService.KIND_MAIL);
-		if (mPrefs.getString("enableFtp", getString(R.string.config_enableFtp))
-				.equals("true"))
-			upload(file.getAbsolutePath(), UploadService.KIND_FTP);
-		if (mPrefs.getString("enableShare",
-				getString(R.string.config_enableShare)).equals("true"))
-			upload(file.getAbsolutePath(), UploadService.KIND_SHARE);
-
+		upload(file.getAbsolutePath());
 	}
 
 	private void setDate(File file) {
@@ -371,76 +370,6 @@ public class EnCam extends Activity {
 		file.setLastModified(time);
 	}
 
-	public void upload(String path, int kind) {
-		String[] data;
-
-		switch (kind) {
-		case UploadService.KIND_MAIL:
-			data = new String[] {
-					path,
-					mPrefs.getString("mailTo",
-							getString(R.string.config_mailTo)),
-					mPrefs.getString("mailSubject",
-							getString(R.string.config_mailSubject)),
-					mPrefs.getString("mailBody",
-							getString(R.string.config_mailBody)),
-					mPrefs.getString("mailFrom",
-							getString(R.string.config_mailFrom)),
-					mPrefs.getString("mailHost",
-							getString(R.string.config_mailHost)),
-					mPrefs.getString("mailPort",
-							getString(R.string.config_mailPort)),
-					mPrefs.getString("mailUser",
-							getString(R.string.config_mailUser)),
-					mPrefs.getString("mailPassword",
-							getString(R.string.config_mailPassword)),
-					mPrefs.getString("mailSsl", "false") };
-			break;
-		case UploadService.KIND_FTP:
-			data = new String[] {
-					path,
-					mPrefs.getString("ftpHost",
-							getString(R.string.config_ftpHost)),
-					mPrefs.getString("ftpPort",
-							getString(R.string.config_ftpPort)),
-					mPrefs.getString("ftpUser",
-							getString(R.string.config_ftpUser)),
-					mPrefs.getString("ftpPassword",
-							getString(R.string.config_ftpPassword)),
-					mPrefs.getString("ftpDirectory",
-							getString(R.string.config_ftpDirectory)) };
-			break;
-		case UploadService.KIND_SHARE:
-			data = new String[] { path };
-			share(data);
-			break;
-		default:
-			data = new String[] {};
-		}
-
-		if (kind != UploadService.KIND_NONE && kind != UploadService.KIND_SHARE) {
-			Intent upload = new Intent(this, UploadService.class);
-			upload.putExtra(UploadService.KIND, kind);
-			upload.putExtra(UploadService.CONNECTION_DATA, data);
-			startService(upload);
-		}
-
-	}
-
-	private void share(String[] data) {
-		Intent shareIntent = new Intent(Intent.ACTION_SEND);
-		shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
-		shareIntent.setType("application/octet-stream");
-
-		// For a file in shared storage. For data in private storage, use a
-		// ContentProvider.
-		Uri uri = new Uri.Builder().path(data[0]).build();
-		shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
-
-		startActivity(Intent.createChooser(shareIntent,
-				getString(R.string.dialog_share)));
-	}
-
 	// generates a pseudorandom file name (.ejpg for encrypted jpeg)
 	String getSaveFileName() {
 		return Integer.toHexString(mPRNG.nextInt()) + ".ejpg";
@@ -449,6 +378,69 @@ public class EnCam extends Activity {
 	private void notify(int string) {
 		Toast.makeText(getApplicationContext(), getString(string),
 				Toast.LENGTH_LONG).show();
+	}
+
+	private void parseFailedUploads() {
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		failedUploads = new LinkedList<String>();
+		for (String parseString : settings.getString("failedUploads", "")
+				.split(";")) {
+			failedUploads.offer(parseString);
+		}
+	}
+
+	private void saveFailedUploads() {
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		StringBuffer sb = new StringBuffer(settings.getString("failedUploads",
+				""));
+		while (failedUploads.isEmpty() == false) {
+			sb.append(";").append(failedUploads.poll());
+		}
+		editor.putString("failedUploads", sb.toString()).commit();
+	}
+
+	public int getFailedUploadsCount() {
+		return failedUploads.size();
+	}
+
+	private void retryFailedUploads() {
+		SharedPreferences settings = getPreferences(MODE_PRIVATE);
+		SharedPreferences.Editor editor = settings.edit();
+		String path;
+		if (failedUploads.isEmpty() == true)
+			notify(R.string.warning_noRetryUploads);
+		else
+			notify(R.string.info_retryUploads);
+		while (failedUploads.isEmpty() == false) {
+			path = failedUploads.poll();
+			editor.putString("failedUploads",
+					settings.getString("failedUploads", "").replace(path, ""))
+					.commit();
+			upload(path);
+		}
+	}
+
+	public void upload(String path) {
+		String service = mPrefs.getString("uploadService", "");
+		if (mPrefs.getBoolean("uploadEnable", false) && !path.equals("")
+				&& !service.equals(""))
+			if (service.equals("share")) {
+				Intent shareIntent = new Intent(Intent.ACTION_SEND);
+				shareIntent
+						.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+				shareIntent.setType("application/octet-stream");
+
+				Uri uri = new Uri.Builder().path(path).build();
+				shareIntent.putExtra(Intent.EXTRA_STREAM, uri);
+
+				startActivity(Intent.createChooser(shareIntent,
+						getString(R.string.dialog_share)));
+			} else {
+				Intent upload = new Intent(this, UploadService.class);
+				upload.putExtra(UploadService.PATH, path);
+				startService(upload);
+			}
 	}
 
 	PictureCallback onPictureTakenJPEG = new PictureCallback() {
@@ -462,22 +454,10 @@ public class EnCam extends Activity {
 			startActivityForResult(ear, Apg.ENCRYPT_MESSAGE);
 
 			cam.startPreview();
-			return;
+
+			data = null; // free unencrypted file
+			System.gc(); // hope for gc to overwrite it
 		}
 	};
 
-	public class ResponseReceiver extends BroadcastReceiver {
-		public static final String ACTION_RESP = "de.chaos_darmstadt.schlafwandler.EnCam.intent.action.MESSAGE_PROCESSED";
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			EnCam.this.notify(intent.getIntExtra(UploadService.RESULT,
-					R.string.error_mailSendError));
-		}
-
-	}
-
 }
-
-// ----------------------------------------------------------------------
-

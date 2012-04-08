@@ -6,5 +6,10 @@
         <item>static</item>
         <item>actual</item>
     </string-array>
+    <string-array name="pref_uploadServiceValues">
+        <item>mail</item>
+        <item>ftp</item>
+        <item>share</item>
+    </string-array>
 
 </resources>

@@ -1,6 +1,7 @@
 package de.chaos_darmstadt.schlafwandler.EnCam;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.regex.Matcher;
 
@@ -8,109 +9,150 @@ import org.apache.commons.net.ftp.FTPClient;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 public class UploadService extends IntentService {
-	static final int KIND_NONE = 0;
-	static final int KIND_MAIL = 1;
-	static final int KIND_FTP = 2;
-	static final int KIND_SHARE = 3;
-
-	static final String KIND = "kind";
-	static final String RESULT = "result";
-	static final String CONNECTION_DATA = "data";
+	static final String PATH = "path";
 
 	public UploadService() {
 		super("upload");
 	}
 
-	private int sendMail(String[] data) {
+	private Bundle sendMail(String path) {
 
 		try {
+			SharedPreferences mPrefs = PreferenceManager
+					.getDefaultSharedPreferences(this);
+
 			Mail mail = new Mail();
 
-			mail.setContent(data[1], data[2], data[3]);
+			mail.setContent(mPrefs.getString("mailTo",
+					getString(R.string.config_mailTo)), mPrefs.getString(
+					"mailSubject", getString(R.string.config_mailSubject)),
+					mPrefs.getString("mailBody",
+							getString(R.string.config_mailBody)));
 
-			mail.setAccount(data[4], data[5], data[6], data[7], data[8],
-					data[9]);
+			mail.setAccount(mPrefs.getString("mailFrom",
+					getString(R.string.config_mailFrom)), mPrefs.getString(
+					"mailHost", getString(R.string.config_mailHost)),
+					mPrefs.getString("mailPort",
+							getString(R.string.config_mailPort)), mPrefs
+							.getString("mailUser",
+									getString(R.string.config_mailUser)),
+					mPrefs.getString("mailPassword",
+							getString(R.string.config_mailPassword)), mPrefs
+							.getString("mailSsl", "false"));
 
-			if (!data[0].equals("")) {
-				mail.addAttachment(data[0]);
+			mail.addAttachment(path);
+			if (!mail.send()) {
+				return makeResultBundle(R.string.error_mailSendError, false);
 			}
-			if (!mail.send())
-				return R.string.error_mailSendError;
 		} catch (Exception e) {
-			return R.string.error_mailSendError;
+			return makeResultBundle(R.string.error_mailSendError, false);
 		}
-
-		return R.string.success_mailSend;
+		return makeResultBundle(R.string.success_mailSend, true);
 	}
 
-	private int ftpUpload(String[] data) {
-		int result = R.string.error_ftpUploadError;
+	private Bundle ftpUpload(String path) {
+		SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+
+		Bundle result = makeResultBundle(R.string.error_ftpUploadError, false);
 		try {
 			FTPClient ftpClient = new FTPClient();
 
-			ftpClient.connect(data[1], Integer.parseInt(data[2]));
+			ftpClient.connect(mPrefs.getString("ftpHost",
+					getString(R.string.config_ftpHost)), Integer
+					.parseInt(mPrefs.getString("ftpPort",
+							getString(R.string.config_ftpPort))));
 			ftpClient.enterLocalPassiveMode();
-			ftpClient.login(data[3], data[4]);
-			ftpClient.changeWorkingDirectory(data[5]);
+			ftpClient.login(mPrefs.getString("ftpUser",
+					getString(R.string.config_ftpUser)), mPrefs.getString(
+					"ftpPassword", getString(R.string.config_ftpPassword)));
+			ftpClient.changeWorkingDirectory(mPrefs.getString("ftpDirectory",
+					getString(R.string.config_ftpDirectory)));
 			ftpClient
 					.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
 			BufferedInputStream buffIn = null;
-			buffIn = new BufferedInputStream(new FileInputStream(data[0]));
+			buffIn = new BufferedInputStream(new FileInputStream(path));
 			ftpClient.enterLocalPassiveMode();
-			if (ftpClient.storeFile(data[0].substring(
-					data[0].lastIndexOf(Matcher.quoteReplacement("/")) + 1,
-					data[0].length()), buffIn))
-				result = R.string.success_ftpUpload;
+			if (ftpClient.storeFile(path.substring(
+					path.lastIndexOf(Matcher.quoteReplacement("/")) + 1,
+					path.length()), buffIn))
+				result = makeResultBundle(R.string.success_ftpUpload, true);
 			else
-				result = R.string.error_ftpUploadError;
+				result = makeResultBundle(R.string.error_ftpUploadError, true);
 			buffIn.close();
 			ftpClient.logout();
 			ftpClient.disconnect();
 		} catch (Exception e) {
-			result = R.string.error_ftpUploadError;
+			result = makeResultBundle(R.string.error_ftpUploadError, true);
+
 		}
+		return result;
+	}
+
+	private Bundle makeResultBundle(int msg, boolean success) {
+		Bundle result = new Bundle();
+		result.putInt("msg", msg);
+		result.putBoolean("success", success);
 		return result;
 	}
 
 	@Override
 	protected void onHandleIntent(Intent intent) {
-		int result = R.string.error_generalError;
+		SharedPreferences mPrefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		Bundle bdl = null;
+		String path = intent.getStringExtra(PATH);
+		String service = mPrefs.getString("uploadService", "");
 
-		switch (intent.getIntExtra(KIND, KIND_NONE)) {
-		case KIND_MAIL:
-			result = sendMail(intent.getStringArrayExtra(CONNECTION_DATA));
-			break;
-		case KIND_FTP:
-			result = ftpUpload(intent.getStringArrayExtra(CONNECTION_DATA));
-			break;
+		if (service.equals("mail"))
+			bdl = sendMail(path);
+		else if (service.equals("ftp"))
+			bdl = ftpUpload(path);
+
+		if (bdl != null) {
+			if (bdl.getBoolean("success", false) == false) {
+				mPrefs.edit()
+						.putString(
+								"failedUploads",
+								mPrefs.getString("failedUploads", "") + ";"
+										+ path).commit();
+			} else {
+				if (mPrefs.getBoolean("uploadDeleteAfter", false)) {
+					File file = new File(path);
+					if (file.delete())
+						bdl = makeResultBundle(
+								R.string.success_uploadAndDelete, true);
+					else {
+						bdl = makeResultBundle(
+								R.string.warning_uploadDeleteFailed, true);
+					}
+				}
+				;
+			}
+
+			// send msg for toast notification
+			Message msg = new Message();
+			msg.setData(bdl);
+			handler.sendMessage(msg);
 		}
-
-		// toast test begin
-		Message msg = new Message();
-		Bundle bdl = new Bundle();
-		bdl.putInt("result", result);
-		msg.setData(bdl);
-		handler.sendMessage(msg);
-		// toast test end
-
 	}
 
-	// toast test method
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
 			Toast.makeText(
 					getApplicationContext(),
-					getString(msg.getData().getInt("result",
+					getString(msg.getData().getInt("msg",
 							R.string.error_generalError)), Toast.LENGTH_LONG)
-					.show(); // TODO result doesnt work yet, if sucessfully
-								// finished force-close
+					.show();
 		}
 	};
 

@@ -21,5 +21,10 @@
         android:icon="@android:drawable/ic_menu_help"
         android:title="@string/menu_help">
     </item>
+    <item
+        android:id="@+id/uploads"
+        android:icon="@android:drawable/ic_menu_upload"
+        android:title="@string/menu_retryUpload">
+    </item>
 
 </menu>
