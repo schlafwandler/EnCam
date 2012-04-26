@@ -1,10 +1,84 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
     <string name="app_name">EnCam</string>
-	
-<string name="error_fileSaveError">An error orrured while saving the photo</string><string name="warning_noKeySelected">No public keys selected. Use \'menu\' -> \'Select Keys\' to select public keys for encryption</string>
-<string name="warning_noExternalStorage">No SDcard or similar storage found, using internal storage</string>
-<string name="saveDirNameDefault">Encrypted Pictures</string>
-<string name="takePictureButton_Text">CLICK</string>
+    <string name="app_version">0.1</string>
+    <string name="error_generalError">A general error orrured while uploading. Try again.</string>
+    <string name="error_fileSaveError">An error orrured while saving the photo!</string>
+    <string name="error_mailSendError">An error orrured while sending the mail. Check your mail settings and internet connectivity.</string>
+    <string name="error_ftpUploadError">An error orrured while uploading to the ftp server. Check your ftp settings and internet connectivity.</string>
+    <string name="error_setMailPreferences">Please fill out all mail preferences</string>
+    <string name="error_setFtpPreferences">Please fill out all ftp preferences</string>
+    <string name="warning_noKeySelected">No public keys selected. Pease select at least one public key for encryption.</string>
+    <string name="warning_noExternalStorage">No SDcard or similar storage found, using internal storage</string>
+    <string name="warning_noApg">APG is not installed. This app requires APG to work. Click Close to go to Android Market and close this App.</string>
+    <string name="warning_noRetryUploads">There are no uploads to retry.</string>
+    <string name="warning_uploadDeleteFailed">Warning: The picture was uploaded, but not deleted!</string>
+    <string name="success_mailSend">The mail was sent successfully!</string>
+    <string name="success_ftpUpload">The picture was uploaded successfully!</string>
+    <string name="success_uploadAndDelete">The picture was uploaded and deleted successfully!</string>
+    <string name="info_retryUploads">Retrying to upload files…</string>
+    <string name="pref_saveFile">Save File</string>
+    <string name="pref_path">Path</string>
+    <string name="pref_pathDefault">Encrypted Pictures</string>
+    <string name="pref_date">Date</string>
+    <string name="pref_dateDesc">Choose how the modification date of the encrypted output file ist determined</string>
+
+    <string-array name="pref_dateEntries">
+        <item>Random</item>
+        <item>Static</item>
+        <item>Actual</item>
+    </string-array>
+
+    <string name="pref_upload">Upload</string>
+    <string name="pref_uploadEnable">Enable Uploading</string>
+    <string name="pref_uploadService">Service</string>
+    <string name="pref_uploadServiceDesc">Choose a service to upload the files with.</string>
+
+    <string-array name="pref_uploadServiceEntries">
+        <item>Mail</item>
+        <item>FTP</item>
+        <item>3rd Party App</item>
+    </string-array>
+
+    <string name="pref_uploadPreferences">Server Settings</string>
+    <string name="pref_uploadRetry">Enable retry uploads</string>
+    <string name="pref_uploadDeleteAfter">Delete files after upload</string>
+    <string name="pref_mail">Send Photos via Mail</string>
+    <string name="pref_mailEnable">Enable Mail</string>
+    <string name="pref_mailPreferences">Mail Preferences</string>
+    <string name="pref_mailAccount">Account</string>
+    <string name="pref_mailFrom">Mailadress</string>
+    <string name="pref_mailHost">Mailserver</string>
+    <string name="pref_mailPort">Port</string>
+    <string name="pref_mailUser">User</string>
+    <string name="pref_mailPassword">Password</string>
+    <string name="pref_mailSsl">Enable SSL</string>
+    <string name="pref_mailContent">Content</string>
+    <string name="pref_mailTo">To</string>
+    <string name="pref_mailSubject">Subject</string>
+    <string name="pref_mailBody">Content</string>
+    <string name="pref_ftp">Upload Photos to FTP server</string>
+    <string name="pref_ftpEnable">Enable FTP</string>
+    <string name="pref_ftpPreferences">FTP Preferences</string>
+    <string name="pref_ftpAccount">Account</string>
+    <string name="pref_ftpHost">Host</string>
+    <string name="pref_ftpPort">Port</string>
+    <string name="pref_ftpUser">User</string>
+    <string name="pref_ftpPassword">Password</string>
+    <string name="pref_ftpSsl">Enable SSL</string>
+    <string name="pref_ftpDirectory">Directory on FTP server</string>
+    <string name="pref_enableShare">Enable sharing via 3rd party apps</string>
+    <string name="pref_compression">Compression</string>
+    <string name="menu_selectKeys">Select Keys</string>
+    <string name="menu_about">About</string>
+    <string name="about_text">by Schlafwandler and Pogdi</string>
+    <string name="menu_help">Help</string>
+    <string name="help_text">&lt;big>Select Keys&lt;/big>&lt;br />Go Menu &lt;i>Select public keys&lt;/i> and check the keys you want your pictures to be encrypted with.&lt;br />&lt;br />&lt;big>Take pictures&lt;/big>&lt;br />You can take pictures tapping either anywhere on the screen or the Directional Pad Center key (if your phone has one). The pictures are encrypted on the fly and saved in a folder on the storage medium you can define in &lt;i>Preferences&lt;/i>. The default folder is &lt;i>Encrypted Pictures&lt;/i>. The filename is generated randomly, the suffix is always &lt;i>.ejpg&lt;/i>.&lt;br />&lt;br />&lt;big>Decrypt photos&lt;/big>&lt;br />The encrypted photographs are stored in the described folder on the SD-Card. They can be copied to any computer and decrypted using gpg.&lt;br />You should store the decrypted pictures only on secured media, like an encrypted drive.</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="menu_retryUpload">Retry Uploads</string>
+    <string name="bt_chooseKey">Choose Key…</string>
+    <string name="bt_close">Close</string>
+    <string name="dialog_share">"Share via 3rd party App"</string>
+
 </resources>

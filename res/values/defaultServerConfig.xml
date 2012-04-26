@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--     this file defines the default server config. It's used, if the preferences remain empty and gets compiled
+if you don't want your server settings to be easily retrievable, compile with a costom config, but mind: the connection data can still be sniffed -->
+
+
+  <resources xmlns:android="http://schemas.android.com/apk/res/android">
+    <string name="config_enableMail">false</string>
+    <string name="config_mailTo"></string>
+    <string name="config_mailSubject">EnCam</string>
+    <string name="config_mailBody"></string>
+    <string name="config_mailFrom"></string>
+    <string name="config_mailHost"></string>
+    <string name="config_mailPort">25</string>
+    <string name="config_mailUser"></string>
+    <string name="config_mailPassword"></string>
+    <string name="config_enableFtp">false</string>
+    <string name="config_ftpHost"></string>
+    <string name="config_ftpPort">21</string>
+    <string name="config_ftpUser"></string>
+    <string name="config_ftpPassword"></string>
+    <string name="config_ftpDirectory"></string>
+    <string name="config_enableShare">false</string>
+
+</resources>

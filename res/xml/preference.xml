@@ -1,15 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen
-  xmlns:android="http://schemas.android.com/apk/res/android">
-<PreferenceCategory android:key="localStorage" android:title="Save File">
-<EditTextPreference 
-				android:key="savePicturesPath"
-				android:title="Path" 
-				android:defaultValue="Encrypted Pictures"
-				android:summary="Where your photos are stored on the SD card">
-</EditTextPreference> 
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <PreferenceCategory
+        android:key="files"
+        android:title="@string/pref_saveFile" >
+        <EditTextPreference
+            android:defaultValue="@string/pref_pathDefault"
+            android:key="path"
+            android:summary="Where your photos are stored on the SD card"
+            android:title="@string/pref_path" >
+        </EditTextPreference>
 
-<!-- <CheckBoxPreference android:summary="Try saving photos on Internal Storage if no removable storage media (SD card) is availible" android:key="internalFallback" android:title="Revert to Internal Storage"></CheckBoxPreference> -->
-</PreferenceCategory>
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_dateEntries"
+            android:entryValues="@array/pref_dateValues"
+            android:key="date"
+            android:persistent="true"
+            android:shouldDisableView="false"
+            android:summary="@string/pref_dateDesc"
+            android:title="@string/pref_date" />
+
+        <!-- <CheckBoxPreference android:summary="Try saving photos on Internal Storage if no removable storage media (SD card) is availible" android:key="internalFallback" android:title="Revert to Internal Storage"></CheckBoxPreference> -->
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:key="upload"
+        android:title="@string/pref_upload" >
+        <CheckBoxPreference
+            android:key="uploadEnable"
+            android:title="@string/pref_uploadEnable" />
+
+                <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_uploadServiceEntries"
+            android:entryValues="@array/pref_uploadServiceValues"
+            android:key="uploadService"
+            android:persistent="true"
+            android:shouldDisableView="true"
+            android:summary="@string/pref_uploadServiceDesc"
+            android:title="@string/pref_uploadService" android:dependency="uploadEnable"/>
+
+        <PreferenceScreen
+            android:key="uploadPreferences"
+            android:title="@string/pref_uploadPreferences" android:dependency="uploadEnable">
+            <PreferenceScreen android:key="mailPreferences" android:shouldDisableView="true" android:title="@string/pref_mailPreferences">
+                    <PreferenceCategory android:key="mailAccount" android:title="@string/pref_mailAccount">
+                        <EditTextPreference android:inputType="textEmailAddress" android:key="mailFrom" android:singleLine="true" android:title="@string/pref_mailFrom" />
+                        <EditTextPreference android:inputType="textNoSuggestions" android:key="mailHost" android:singleLine="true" android:title="@string/pref_mailHost" />
+                        <EditTextPreference android:inputType="number" android:key="mailPort" android:singleLine="true" android:title="@string/pref_mailPort" />
+                        <EditTextPreference android:inputType="textNoSuggestions" android:key="mailUser" android:singleLine="true" android:title="@string/pref_mailUser" />
+                        <EditTextPreference android:inputType="textPassword" android:key="mailPassword" android:singleLine="true" android:title="@string/pref_mailPassword" />
+
+                        <CheckBoxPreference android:defaultValue="false" android:enabled="false" android:key="mailSsl" android:title="@string/pref_mailSsl" />
+                    </PreferenceCategory>
+                    <PreferenceCategory android:key="mailContent" android:title="@string/pref_mailContent">
+                        <EditTextPreference android:inputType="textEmailAddress" android:key="mailTo" android:singleLine="true" android:title="@string/pref_mailTo" />
+                        <EditTextPreference android:inputType="textEmailSubject" android:key="mailSubject" android:singleLine="true" android:title="@string/pref_mailSubject" />
+                        <EditTextPreference android:key="mailBody" android:title="@string/pref_mailBody" />
+                    </PreferenceCategory>
+                </PreferenceScreen>
+            <PreferenceScreen android:key="ftpPreferences" android:shouldDisableView="true" android:title="@string/pref_ftpPreferences">
+                    <PreferenceCategory android:key="ftpAccount" android:title="@string/pref_ftpAccount">
+                        <EditTextPreference android:inputType="textNoSuggestions" android:key="ftpHost" android:singleLine="true" android:title="@string/pref_ftpHost" />
+                        <EditTextPreference android:inputType="number" android:key="ftpPort" android:singleLine="true" android:title="@string/pref_ftpPort" />
+                        <EditTextPreference android:inputType="textNoSuggestions" android:key="ftpDirectory" android:singleLine="true" android:title="@string/pref_ftpDirectory" />
+                        <EditTextPreference android:inputType="textNoSuggestions" android:key="ftpUser" android:singleLine="true" android:title="@string/pref_ftpUser" />
+                        <EditTextPreference android:inputType="textPassword" android:key="ftpPassword" android:singleLine="true" android:title="@string/pref_ftpPassword" />
+
+                        <CheckBoxPreference android:defaultValue="false" android:enabled="false" android:key="ftpSsl" android:title="@string/pref_ftpSsl" />
+                    </PreferenceCategory>
+                </PreferenceScreen>
+        </PreferenceScreen>
+
+        <CheckBoxPreference
+            android:key="uploadRetry"
+            android:title="@string/pref_uploadRetry" android:dependency="uploadEnable"/>
+        <CheckBoxPreference
+            android:key="uploadDeleteAfter"
+            android:title="@string/pref_uploadDeleteAfter" android:dependency="uploadEnable"/>
+    </PreferenceCategory>
+
+    <!-- <PreferenceCategory android:key="compression" android:title="@string/pref_compression"></PreferenceCategory> -->
+
 </PreferenceScreen>
